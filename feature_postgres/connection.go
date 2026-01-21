@@ -111,10 +111,10 @@ func DeleteBook(ctx context.Context, conn *pgx.Conn, booksID []int) error {
 	return nil
 }
 
-func ListPages(ctx context.Context, conn *pgx.Conn, N int) {
+func ListPages(ctx context.Context, conn *pgx.Conn, N int) error {
 	BooksPages, err := SelectBooks(ctx, conn)
 	if err != nil {
-		return
+		return err
 	}
 	pages := (len(BooksPages) / N) + 1
 	offset := 0
@@ -128,7 +128,7 @@ func ListPages(ctx context.Context, conn *pgx.Conn, N int) {
 		books := make([]BookModel, 0)
 		rows, err := conn.Query(ctx, sqlQuery, N, offset)
 		if err != nil {
-			return
+			return err
 		}
 
 		defer rows.Close()
@@ -137,7 +137,7 @@ func ListPages(ctx context.Context, conn *pgx.Conn, N int) {
 			var book BookModel
 			err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Review, &book.PublicationYear, &book.IsRead, &book.AddedAt, &book.FinishedAt)
 			if err != nil {
-				return
+				return err
 			}
 			books = append(books, book)
 		}
@@ -146,4 +146,5 @@ func ListPages(ctx context.Context, conn *pgx.Conn, N int) {
 		pp.Print(books)
 		offset += N
 	}
+	return nil
 }

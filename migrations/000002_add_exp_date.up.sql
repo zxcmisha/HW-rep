@@ -1,0 +1,1 @@
+ALTER TABLE products ADD COLUMN exp_date TIMESTAMP NOT NULL;
